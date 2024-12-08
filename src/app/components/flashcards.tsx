@@ -1,12 +1,23 @@
 'use client'
 
-import React from "react";
+import React, { useState } from "react";
 
 export default function Flashcard() {
+    const [facingFront, setFacingFront] = useState(true);
+
+    const handleClick = () => {
+        setFacingFront(!facingFront)
+    }
+
     return (
-        <div className="bg-primary_blue flex justify-center items-center w-[300px] h-[300px] mt-20 ml-20">
-            <div className="flex justify-center items-center w-4/5 h-4/5 bg-white cursor-pointer p-4">
-            <p className="text-xl">Hi how are you doing</p>
+        <div className="flip-card mt-20 ml-8" onClick={handleClick}>
+            <div className={`flip-card-inner ${!facingFront ? "flipped" : ""}`}>
+                <div className="flip-card-front bg-primary_blue">
+                    <p>How are you</p>
+                </div>
+                <div className="flip-card-back bg-primary_blue">
+                    <p>Comment ca va</p>
+                </div>
             </div>
         </div>
     )

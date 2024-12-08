@@ -4,7 +4,7 @@ import Flashcard from "./components/flashcards";
 
 export default function Home() {
   return (
-    <div >
+    <div>
       <Header />
       <Flashcard />
     </div>
