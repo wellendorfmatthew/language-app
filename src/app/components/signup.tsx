@@ -2,10 +2,45 @@
 
 import React from "react";
 import Link from "next/link";
+import { useState } from "react";
+import { z } from "zod";
 
 export default function SignupBox() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-    const handleSignup = async() => {
+    const UserSchema = z.object({
+        email: z.
+            string().
+            email({message: "Must be a valid email address"}),
+        password: z.
+            string().
+            min(8, {message: "Password must contain at least 8 characters"}).
+            max(50, {message: "Password must be less than 50 characters"}).
+            refine((password) => /[A-Z]/.test(password), {
+                message: "Password must contain an upper character"
+            }).
+            refine((password) => /[a-z]/.test(password), {
+                message: "Password must contain a lower character"
+            }).
+            refine((password) => /[0-9]/.test(password), {
+                message: "Password must contain a number"
+            }).
+            refine((password) => /[!@#$%^&*]/.test(password), {
+                message: "Password must contain a special character"
+            })
+    })
+
+    type User = z.infer<typeof UserSchema>;
+
+    const user: User = {
+        email: "jimbobjoe@gmail.com",
+        password: "Beepboop6989$"
+    }
+
+    const handleSignup = async(email: string, password: string) => {
+        console.log(UserSchema.parse(user));
+        return ;
         try {
             const response = await fetch("/api/signup", {
                 method: "POST",
@@ -13,8 +48,8 @@ export default function SignupBox() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    email: "email@email.com",
-                    password: "beepboop"
+                    email: email,
+                    password: password
                 }),
             });
 
@@ -38,7 +73,7 @@ export default function SignupBox() {
             </div>
             <button 
                 className="px-4 py-4 bg-primary_blue rounded-xl shadow-xl hover:brightness-105 text-white"
-                onClick={handleSignup}
+                onClick={() => handleSignup(email, password)}
                 >Create Account
             </button>
             <p>Already have an account? <Link href="/signin" className="text-primary_blue hover:underline">Sign in</Link></p>
