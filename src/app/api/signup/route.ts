@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 import { Prisma } from "@prisma/client";
+import { serialize } from "cookie";
+import { sign } from "jsonwebtoken";
 
-export async function POST(req: NextRequest) { // Also make sure to add password/email validation and hashing
+export async function POST(req: NextRequest) { 
     const body = await req.json();
     const { email, password } = body;
 
@@ -32,10 +34,28 @@ export async function POST(req: NextRequest) { // Also make sure to add password
             },
         })
 
+        const secret = process.env.JWT_KEY || "";
+
+        const token = sign(
+            {
+              email,
+            },
+            secret, {
+              expiresIn: 60 * 60 * 24 * 30
+            }
+          );
+  
+        const serialized = serialize("session", token, {
+            httpOnly: true,
+            maxAge: 60 * 60 * 24 * 30,
+            path: '/'
+        })
+
         return NextResponse.json(
-            { message: "User created successfully", user: createUser },
-            { status: 201 }
+            { message: "User created successfully ", createUser},
+            { status: 201, headers: { "Set-Cookie": serialized } },
         )
+
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === "P2002") {

@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 
-export default function SignupBox() {
+export default function SigninBox() {
     const [error, setError] = useState("");
     const router = useRouter();
     const UserSchema = z.object({
@@ -16,28 +16,14 @@ export default function SignupBox() {
             string().
             email({message: "Must be a valid email address"}),
         password: z.
-            string().
-            min(8, {message: "Password must contain at least 8 characters"}).
-            max(50, {message: "Password must be less than 50 characters"}).
-            refine((password) => /[A-Z]/.test(password), {
-                message: "Password must contain an upper character"
-            }).
-            refine((password) => /[a-z]/.test(password), {
-                message: "Password must contain a lower character"
-            }).
-            refine((password) => /[0-9]/.test(password), {
-                message: "Password must contain a number"
-            }).
-            refine((password) => /[!@#$%^&*]/.test(password), {
-                message: "Password must contain a special character"
-            })
+            string()
     })
     type User = z.infer<typeof UserSchema>;
     const { register, handleSubmit, formState: { errors }, } = useForm<User>({resolver: zodResolver(UserSchema)});
 
     const handleSignup = async(email: string, password: string) => {
         try {
-            const response = await fetch("/api/signup", {
+            const response = await fetch("/api/signin", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -67,7 +53,7 @@ export default function SignupBox() {
         <form 
             className="w-[400px] h-[500px] flex flex-col gap-8 justify-center items-center border-2 border-primary_blue mt-16 rounded-xl"
             onSubmit={handleSubmit((data) => handleSignup(data.email, data.password))}>
-            <h1 className="text-4xl">Sign Up</h1>
+            <h1 className="text-4xl">Sign In</h1>
             <div className="flex flex-col w-4/5">
                 <input 
                     className="py-4 px-4 ml-2 bg-gray-100 rounded-xl outline-none" 
@@ -88,10 +74,10 @@ export default function SignupBox() {
                 className="px-4 py-4 bg-primary_blue rounded-xl shadow-xl hover:brightness-105 text-white"
                 type="submit"
             >
-                Create Account
+                Login
             </button>
             <span className="w-[316.8px] h-[24px] text-red-600">{error &&  error}</span>
-            <p>Already have an account? <Link href="/signin" className="text-primary_blue hover:underline">Sign in</Link></p>
+            <p>Already have an account? <Link href="/signup" className="text-primary_blue hover:underline">Sign up</Link></p>
         </form>
     )
 }
