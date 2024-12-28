@@ -90,7 +90,7 @@ export default function SignupBox() {
             >
                 Create Account
             </button>
-            <span className="w-[316.8px] h-[24px] text-red-600">{error &&  error}</span>
+            <span className="w-[316.8px] h-[24px] text-red-600">{error && error}</span>
             <p>Already have an account? <Link href="/signin" className="text-primary_blue hover:underline">Sign in</Link></p>
         </form>
     )

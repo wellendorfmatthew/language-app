@@ -21,7 +21,7 @@ export default function SigninBox() {
     type User = z.infer<typeof UserSchema>;
     const { register, handleSubmit, formState: { errors }, } = useForm<User>({resolver: zodResolver(UserSchema)});
 
-    const handleSignup = async(email: string, password: string) => {
+    const handleSignin = async(email: string, password: string) => {
         try {
             const response = await fetch("/api/signin", {
                 method: "POST",
@@ -52,7 +52,7 @@ export default function SigninBox() {
     return (
         <form 
             className="w-[400px] h-[500px] flex flex-col gap-8 justify-center items-center border-2 border-primary_blue mt-16 rounded-xl"
-            onSubmit={handleSubmit((data) => handleSignup(data.email, data.password))}>
+            onSubmit={handleSubmit((data) => handleSignin(data.email, data.password))}>
             <h1 className="text-4xl">Sign In</h1>
             <div className="flex flex-col w-4/5">
                 <input 
@@ -76,7 +76,7 @@ export default function SigninBox() {
             >
                 Login
             </button>
-            <span className="w-[316.8px] h-[24px] text-red-600">{error &&  error}</span>
+            <span className="w-[316.8px] h-[24px] text-red-600">{error && error}</span>
             <p>Already have an account? <Link href="/signup" className="text-primary_blue hover:underline">Sign up</Link></p>
         </form>
     )

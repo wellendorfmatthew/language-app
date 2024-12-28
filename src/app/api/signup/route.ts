@@ -3,6 +3,7 @@ import { prisma } from "../../../../lib/prisma";
 import { Prisma } from "@prisma/client";
 import { serialize } from "cookie";
 import { sign } from "jsonwebtoken";
+import { encrypt } from "../../../../lib/jwt";
 
 export async function POST(req: NextRequest) { 
     const body = await req.json();
