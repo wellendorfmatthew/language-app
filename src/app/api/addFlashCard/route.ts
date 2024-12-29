@@ -4,18 +4,11 @@ import { error } from "console";
 
 export const POST = async (req: NextRequest) => {
     const body = await req.json();
-    const { flashcardDeckID, flashcardID, question, answer } = body;
+    const { flashcardDeckID, question, answer } = body;
     try {
         if (!flashcardDeckID) {
             return NextResponse.json(
                 { message: "FlashcardDeck id is required" },
-                { status: 400 }
-            );
-        }
-
-        if (!flashcardID) {
-            return NextResponse.json(
-                { message: "Flashcard id is required" },
                 { status: 400 }
             );
         }
