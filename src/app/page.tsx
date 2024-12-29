@@ -6,6 +6,7 @@ import Flashcard from "./components/flashcards";
 import { useEffect, useState } from "react";
 import React from "react";
 import { useRouter } from "next/navigation";
+import AddFlashCardForm from "./components/addflashcard";
 
 export default function Home() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function Home() {
       <div>
         <Header />
         You are signed in!
+        <AddFlashCardForm />
       </div>
     );
   } else {
