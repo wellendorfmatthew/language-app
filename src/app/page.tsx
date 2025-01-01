@@ -13,16 +13,16 @@ export default function Home() {
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      const user = await getUser();
-      console.log("user", user);
+    // (async () => { temporarily comement this for testing purproses
+    //   const user = await getUser();
+    //   console.log("user", user);
 
-      if (!user) {
-        router.push("/signin")
-        return;
-      }
-      setSignedIn(true);
-    })()
+    //   if (!user) {
+    //     router.push("/signin")
+    //     return;
+    //   }
+    //   setSignedIn(true);
+    // })()
   })
 
   const getUser = async() => {
@@ -49,6 +49,7 @@ export default function Home() {
     return (
       <div>
         <Header />
+        <AddFlashCardForm />
       </div>
     )
   }
