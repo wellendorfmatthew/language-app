@@ -21,7 +21,7 @@ export default function AddFlashCardForm() {
     }
 
     const handleSubmit = async(e: React.FormEvent) => {
-        e.preventDefault
+        e.preventDefault();
         try {
             const response = await fetch("api/addFlashCards", {
                 method: "POST",
