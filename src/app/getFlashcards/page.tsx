@@ -23,7 +23,7 @@ export default function GetFlashCards() {
             }
     
             const json = await response.json();
-            console.log(json.data);   
+            console.log(json.data);
 
             return json.data;
         } catch (error: any) {
