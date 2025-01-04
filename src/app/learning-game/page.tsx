@@ -53,26 +53,21 @@ export default function GetFlashCards() {
         const flashcardDeck = await getFlashcards();
         console.log("flashcards", flashcardDeck);
 
-        if (!flashcards) {
-            console.log("can't get cards");
+        if (!flashcardDeck || flashcardDeck.length === 0) {
+            console.log("Can't get cards");
         }
 
-        setFlashcards(
-            flashcardDeck.map((flashcard: Flashcard) => ({
-                question: flashcard.question,
-                answer: flashcard.answer
-            }))
-        )
+        setFlashcards(flashcardDeck)
     })()
     }, []);
 
     return (
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center w-full">
             <Header />
-            <Carousel>
+            <Carousel className="relative overflow-hidden w-full max-w-4xl">
                 <CarouselContent className="flex justify-center">
-                    {flashcards.map((flashcard, index) => (
-                        <CarouselItem className="px-4" key={index}>
+                    {flashcards.map((flashcard) => (
+                        <CarouselItem className="px-4" key={flashcard.id}>
                             <div className="flip-card mt-20 cursor-pointer" onClick={handleClick}>
                                 <div className={`flip-card-inner ${!facingFront ? "flipped" : ""}`}>
                                     <div className="flip-card-front bg-primary_blue rounded-xl">
@@ -82,17 +77,16 @@ export default function GetFlashCards() {
                                         <p>{flashcard.answer}</p>
                                         <div className="flex gap-4">
                                             <p onClick={() => handleLearnedCards(flashcard)}>I knew that</p>
-                                            <p >I need more time</p>
+                                            <p>I need more time</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </CarouselItem>
-                    ))
-                    }
+                    ))}
                 </CarouselContent>
-                <CarouselPrevious onClick={() => setFacingFront(true)} />
-                <CarouselNext onClick={() => setFacingFront(true)} />
+                <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10" onClick={() => setFacingFront(true)} />
+                <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10" onClick={() => setFacingFront(true)} />
             </Carousel>
         </div>
     )
