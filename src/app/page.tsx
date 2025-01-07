@@ -11,13 +11,11 @@ import AddFlashCardForm from "./components/addflashcard";
 export default function Home() {
   const router = useRouter();
   const [signedIn, setSignedIn] = useState(false);
-  const [email, setEmail] = useState("");
 
   useEffect(() => {
     (async () => { 
       const user = await getUser();
       console.log("user", user);
-      setEmail(user);
 
       if (!user) {
         router.push("/signin")
@@ -46,9 +44,6 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email: email
-        }),
       })
 
       if (!response.ok) {
