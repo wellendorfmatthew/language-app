@@ -13,16 +13,16 @@ export default function Home() {
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    // (async () => { temporarily comement this for testing purproses
-    //   const user = await getUser();
-    //   console.log("user", user);
+    (async () => { 
+      const user = await getUser();
+      console.log("user", user);
 
-    //   if (!user) {
-    //     router.push("/signin")
-    //     return;
-    //   }
-    //   setSignedIn(true);
-    // })()
+      if (!user) {
+        router.push("/signin")
+        return;
+      }
+      setSignedIn(true);
+    })()
   })
 
   const getUser = async() => {
@@ -37,12 +37,35 @@ export default function Home() {
     }
   }
 
+  const signout = async() => {
+    try {
+      const response = await fetch("/api/signout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Unable to sign in");
+      }
+
+      const result = await response.json();
+      console.log(result);
+
+      router.push("/");
+    } catch (error: any) {
+      console.log(error);
+    }
+  }
+
   if (signedIn) {
     return (
       <div>
         <Header />
         You are signed in!
         <AddFlashCardForm />
+        <button onClick={() => signout()}>Sign out</button>
       </div>
     );
   } else {
