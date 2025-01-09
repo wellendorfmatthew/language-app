@@ -12,30 +12,30 @@ export default function Home() {
   const router = useRouter();
   const [signedIn, setSignedIn] = useState(false);
 
-  useEffect(() => {
-    (async () => { 
-      const user = await getUser();
-      console.log("user", user);
+  // useEffect(() => {
+  //   (async () => { 
+  //     const user = await getUser();
+  //     console.log("user", user);
 
-      if (!user) {
-        router.push("/signin")
-        return;
-      }
-      setSignedIn(true);
-    })()
-  })
+  //     if (!user) {
+  //       router.push("/signin")
+  //       return;
+  //     }
+  //     setSignedIn(true);
+  //   })()
+  // })
 
-  const getUser = async() => {
-    try {
-      const response = await fetch("/api/getSession");
-      const data = await response.json();
-      console.log("This is the token: ", data.token);
-      console.log("This is the email: ", data.token.email); 
-      return data.token.email
-    } catch (error) {
-      return null;
-    }
-  }
+  // const getUser = async() => {
+  //   try {
+  //     const response = await fetch("/api/getSession");
+  //     const data = await response.json();
+  //     console.log("This is the token: ", data.token);
+  //     console.log("This is the email: ", data.token.email); 
+  //     return data.token.email
+  //   } catch (error) {
+  //     return null;
+  //   }
+  // }
 
   const signout = async() => {
     try {
