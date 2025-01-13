@@ -113,17 +113,25 @@ export default function MatchingGame() {
     return (
         <div className="flex flex-col items-center">
             <Header />
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 gap-4 mt-12">
                 {flashcards.map((flashcard, index) => (
-                    <div key={index} onClick={() => handleSum(flashcard.question)}>
+                    <div 
+                        className="w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer hover:bg-gray-400 duration-300 focus:bg-purple-700 duration-100" 
+                        key={index}
+                        onClick={() => handleSum(flashcard.question)}
+                    >
                         {flashcard.question}
                     </div>
                     ))
                 }
                 {flashcards.map((flashcard, index) => (
-                    <div key={index} onClick={() => handleSum(flashcard.answer)}>
-                        {flashcard.answer}
-                    </div>
+                    <div 
+                    className="w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center" 
+                    key={index}
+                    onClick={() => handleSum(flashcard.answer)}
+                >
+                    {flashcard.answer}
+                </div>
                     ))
                 }
             </div>
