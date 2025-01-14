@@ -11,65 +11,115 @@ import {
 import Header from "../components/header";
 import { Flashcard } from "@prisma/client";
 
+type CardStyle = "base" | "active" | "right" | "wrong";
+
+type MatchingCard = {
+    id: string,
+    field: string
+    style: CardStyle,
+    class: string,
+};
+
 export default function MatchingGame() {
-    const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
-    const [matchedCards, setMatchedCards] = useState<Flashcard[]>([{ question: '', answer: '' } as Flashcard]);
-    const [possibleMatches, setPossibleMatches] = useState({ question: "", answer: "" });
-    const [sum, setSum] = useState(0);
+    const [flashcards, setFlashcards] = useState<MatchingCard[]>([]);
+    const [possibleMatches, setPossibleMatches] = useState<MatchingCard[]>([]);
 
-    const handleSum = (field: string) => {
-        let num = sum + 1;
-        setSum(num);
-        console.log(num);
+    const handleCardClick = (card: MatchingCard) => {
+        const updatedFlashcards: MatchingCard[] = flashcards.map((flashcard) => {
+            if (flashcard.id === card.id) {
+                return { ...flashcard, style: "active" };
+            }
 
-        if (num === 1) {
-            possibleMatches.question = field;
-            console.log(possibleMatches);
-        }
+            return flashcard;
+        })
 
-        if (num === 2) {
-            possibleMatches.answer = field;
-            console.log(possibleMatches);
-            handleMatch();
+        setFlashcards(updatedFlashcards);
+        
+        if (possibleMatches.length === 0) {
+            setPossibleMatches([card]);
+            console.log("purple");
+        } else {
+            console.log("purple");
+            if (possibleMatches[0].id === card.id) {
+                console.log("green");
+                console.log("green");
+
+                possibleMatches[0].class = "right";
+                card.class = "right";
+
+                setTimeout(() => {
+                    getStyle(possibleMatches[0]);
+                    getStyle(card);
+                }, 2000);
+
+                const newFlashcards = flashcards.filter((flashcard) => flashcard.id !== card.id);
+                setFlashcards(newFlashcards);
+                setPossibleMatches([]);
+            } else {
+                console.log("red");
+                console.log("red");
+
+                possibleMatches[0].class = "wrong";
+                card.class = "wrong";
+                setTimeout(() => {
+                    getStyle(possibleMatches[0]);
+                    getStyle(card);
+                }, 2000);
+
+                console.log("gray");
+                console.log("gray");
+
+                possibleMatches[0].class = "base";
+                card.class = "base";
+                getStyle(possibleMatches[0]);
+                getStyle(card);
+
+                setPossibleMatches([]);
+            }
         }
     }
 
-    const handleMatch = () => {
-        const match = flashcards.find((flashcard) => {
-            console.log(flashcard);
-            console.log(flashcard.question);
-            console.log(flashcard.answer);
-            console.log(possibleMatches.question);
-            console.log(possibleMatches.answer);
-            if (flashcard.question === possibleMatches.question && flashcard.answer === possibleMatches.answer
-                || flashcard.answer === possibleMatches.question && flashcard.question === possibleMatches.answer) {
-                    return flashcard;
-                }
-        })
-
-        if (match) {
-            const updatedFlashcards = [...matchedCards, 
-
-                {   
-                    id: match.id, 
-                    question: match.question, 
-                    answer: match.answer,
-                    createdAt: match.createdAt,
-                    flashcardDeckID: match.flashcardDeckID
-
-                }
-            ];
-            setMatchedCards(updatedFlashcards);
-
-            const currentFlashcards = [...flashcards];
-            const newFlashcards = currentFlashcards.filter((flashcard) => flashcard !== match);
-            setFlashcards(newFlashcards);
-            console.log("Match");
-            setSum(0);
-        } else {
-            console.log("No Match");
-            setSum(0);
+    const getStyle = (card: MatchingCard) => {
+        switch (card.style) {
+            case "active":
+                card.class = "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer bg-primary_purple";
+                break;
+            case "right":
+                card.class = "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer bg-primary_green";
+                break;
+            case "wrong":
+                card.class = "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer bg-primary_red";
+                break;
+            default:
+                card.class = "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer hover:bg-gray-400 duration-300";
+                break;
         }
+    }
+    
+    const shuffleCards = (cards: Flashcard[]): MatchingCard[] => {
+        const shuffle = (array: any[]) => { // Takes flashcards and creates a shuffled deck
+            const newArray = [...array];
+
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+
+            return newArray;
+        }
+
+        const shuffledQuestions = shuffle(cards);
+        const questions: MatchingCard[] = shuffledQuestions.map((card) => ({ id: card.id, field: card.question, style: "base", class: "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer hover:bg-gray-400 duration-300" }));
+        console.log(questions)
+
+        const shuffledAnswers = shuffle(cards);
+        const answers: MatchingCard[] = shuffledAnswers.map((card) => ({ id: card.id, field: card.answer, style: "base", class: "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer hover:bg-gray-400 duration-300" }));
+        console.log(answers)
+
+        const shuffledDeck: MatchingCard[] = shuffle(questions.concat(answers)); // Shuffle the questions and answers
+        console.log(shuffledDeck);
+
+        return shuffledDeck;
     }
 
     const getFlashcards = async() => {
@@ -94,35 +144,24 @@ export default function MatchingGame() {
     (async () => { 
         const flashcardDeck = await getFlashcards();
         console.log("flashcards", flashcardDeck);
+        const shuffledDeck = shuffleCards(flashcardDeck);
+        console.log(shuffledDeck);
 
-        if (!flashcards) {
-            console.log("can't get cards");
-        }
-
-        setFlashcards(
-            flashcardDeck.map((flashcard: Flashcard) => ({
-                question: flashcard.question,
-                answer: flashcard.answer
-            }))
-        )
-
-        setMatchedCards(flashcardDeck.map(() => ({ question: '', answer: ' ' } as Flashcard)));
+        setFlashcards(shuffledDeck);
     })()
     }, []);
 
     return (
         <div className="flex flex-col items-center">
             <Header />
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 gap-4 mt-12">
                 {flashcards.map((flashcard, index) => (
-                    <div key={index} onClick={() => handleSum(flashcard.question)}>
-                        {flashcard.question}
-                    </div>
-                    ))
-                }
-                {flashcards.map((flashcard, index) => (
-                    <div key={index} onClick={() => handleSum(flashcard.answer)}>
-                        {flashcard.answer}
+                    <div 
+                        className={flashcard.class}
+                        key={index}
+                        onClick={() => handleCardClick(flashcard)}
+                    >
+                        {flashcard.field}
                     </div>
                     ))
                 }
