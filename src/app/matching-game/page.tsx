@@ -25,74 +25,50 @@ export default function MatchingGame() {
     const [possibleMatches, setPossibleMatches] = useState<MatchingCard[]>([]);
 
     const handleCardClick = (card: MatchingCard) => {
-        const updatedFlashcards: MatchingCard[] = flashcards.map((flashcard) => {
-            if (flashcard.id === card.id) {
-                return { ...flashcard, style: "active" };
-            }
+        const updateFlashcards = (style: CardStyle, firstCard?: MatchingCard) => {
+            const newFlashcards = flashcards.map((flashcard) => {
+                if (flashcard.field === card.field || flashcard.field === firstCard?.field) { // Change this to something that's guaranteed to be unique
+                    return { ...flashcard, style: style };
+                }
 
-            return flashcard;
-        })
+                return flashcard;
+            })
 
-        setFlashcards(updatedFlashcards);
+            return newFlashcards;
+        }
         
         if (possibleMatches.length === 0) {
+            setFlashcards(updateFlashcards("active"));
             setPossibleMatches([card]);
             console.log("purple");
         } else {
             console.log("purple");
+            setFlashcards(updateFlashcards("active"));
             if (possibleMatches[0].id === card.id) {
                 console.log("green");
                 console.log("green");
-
-                possibleMatches[0].class = "right";
-                card.class = "right";
-
+                setFlashcards(updateFlashcards("right", possibleMatches[0]));
                 setTimeout(() => {
-                    getStyle(possibleMatches[0]);
-                    getStyle(card);
-                }, 2000);
+                    const newFlashcards = flashcards.filter((flashcard) => flashcard.id !== card.id); // Makes sure to get both flashcards that were matched
+                    setFlashcards(newFlashcards);
+                }, 300);
 
-                const newFlashcards = flashcards.filter((flashcard) => flashcard.id !== card.id);
-                setFlashcards(newFlashcards);
                 setPossibleMatches([]);
             } else {
                 console.log("red");
                 console.log("red");
 
-                possibleMatches[0].class = "wrong";
-                card.class = "wrong";
+                setFlashcards(updateFlashcards("wrong", possibleMatches[0]));
+
+                console.log("gray");
+                console.log("gray");
+
                 setTimeout(() => {
-                    getStyle(possibleMatches[0]);
-                    getStyle(card);
-                }, 2000);
-
-                console.log("gray");
-                console.log("gray");
-
-                possibleMatches[0].class = "base";
-                card.class = "base";
-                getStyle(possibleMatches[0]);
-                getStyle(card);
+                    setFlashcards(updateFlashcards("base", possibleMatches[0]));
+                }, 300);
 
                 setPossibleMatches([]);
             }
-        }
-    }
-
-    const getStyle = (card: MatchingCard) => {
-        switch (card.style) {
-            case "active":
-                card.class = "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer bg-primary_purple";
-                break;
-            case "right":
-                card.class = "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer bg-primary_green";
-                break;
-            case "wrong":
-                card.class = "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer bg-primary_red";
-                break;
-            default:
-                card.class = "w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer hover:bg-gray-400 duration-300";
-                break;
         }
     }
     
@@ -157,7 +133,16 @@ export default function MatchingGame() {
             <div className="grid grid-cols-4 gap-4 mt-12">
                 {flashcards.map((flashcard, index) => (
                     <div 
-                        className={flashcard.class}
+                        className={`w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer
+                            ${
+                                flashcard.style === "active"
+                                    ? "bg-primary_purple"
+                                    : flashcard.style === "right"
+                                    ? "bg-primary_green"
+                                    : flashcard.style === "wrong"
+                                    ? "bg-primary_red"
+                                    : "hover:bg-gray-400 duration-300"
+                            }`}
                         key={index}
                         onClick={() => handleCardClick(flashcard)}
                     >
