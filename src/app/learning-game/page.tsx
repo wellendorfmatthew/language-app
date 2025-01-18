@@ -8,17 +8,19 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
+import { type CarouselApi } from "@/components/ui/carousel";
 import Header from "../components/header";
 import { Flashcard } from "@prisma/client";
+import Check from "../../../public/langapp-checkbutton.png";
+import Cross from "../../../public/langapp-deletebutton.png";
+import Image from "next/image";
 
 export default function GetFlashCards() {
+    const [api, setApi] = useState<CarouselApi>();
     const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
-    const [learnedCards, setLearnedCards] = useState<Flashcard[]>([]);
     const [facingFront, setFacingFront] = useState(true);
-    
-    const handleClick = () => {
-        setFacingFront(!facingFront)
-    }
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [id, setID] = useState("");
 
     const getFlashcards = async() => {
         try {
@@ -38,14 +40,26 @@ export default function GetFlashCards() {
         }
     }
 
-    const handleLearnedCards = (flashcard: Flashcard) => {
-        const newLearnedCards = [...learnedCards];
-        newLearnedCards.push(flashcard);
-        setLearnedCards(newLearnedCards);
+    const handleKnowCard = (flashcard: Flashcard) => {
+        const newDeck = flashcards.filter((card) => flashcard.id !== card.id);
+        console.log(newDeck);
+        setFlashcards(newDeck);
+    }
 
-        const currentFlashcards = [...flashcards];
-        const newFlashcards = currentFlashcards.filter((currentCard) => currentCard !== flashcard);
-        setFlashcards(newFlashcards);
+    const handleDontKnowCard = (flashcard: Flashcard) => {
+        const updatedDeck = flashcards.filter((card) => flashcard.id !== card.id);
+        updatedDeck.push(flashcard);
+        console.log(updatedDeck);
+
+        setFlashcards(updatedDeck);
+    }
+
+    const handleSlideChange = (index: number) => {
+        setCurrentIndex(index);
+        const currentFlashcard = flashcards[index];
+        if (currentFlashcard) {
+            setID(currentFlashcard.id);
+        }
     }
 
     useEffect(() => {
@@ -61,33 +75,50 @@ export default function GetFlashCards() {
     })()
     }, []);
 
+    useEffect(() => {
+        if (!api) {
+            return;
+        }
+
+        api.on("select", () => {
+            const index = api.selectedScrollSnap();
+            handleSlideChange(index);
+        })
+    }, [api]);
+
     return (
         <div className="flex flex-col items-center justify-center w-full">
             <Header />
-            <Carousel className="relative overflow-hidden w-full max-w-4xl">
-                <CarouselContent className="flex justify-center">
+            <Carousel className="max-w-4xl justify-center items-center mt-20" setApi={setApi}>
+                <CarouselContent>
                     {flashcards.map((flashcard) => (
-                        <CarouselItem className="px-4" key={flashcard.id}>
-                            <div className="flip-card mt-20 cursor-pointer" onClick={handleClick}>
+                        <CarouselItem key={flashcard.id}>
+                            <div className="flip-card cursor-pointer ml-[256px]" onClick={() => setFacingFront(!facingFront)}>
                                 <div className={`flip-card-inner ${!facingFront ? "flipped" : ""}`}>
                                     <div className="flip-card-front bg-primary_blue rounded-xl">
                                         <p>{flashcard.question}</p>
                                     </div>
                                     <div className="flip-card-back bg-primary_blue rounded-xl">
                                         <p>{flashcard.answer}</p>
-                                        <div className="flex gap-4">
-                                            <p onClick={() => handleLearnedCards(flashcard)}>I knew that</p>
-                                            <p>I need more time</p>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </CarouselItem>
                     ))}
                 </CarouselContent>
-                <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 z-10" onClick={() => setFacingFront(true)} />
-                <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 z-10" onClick={() => setFacingFront(true)} />
+                <CarouselPrevious />
+                <CarouselNext />
             </Carousel>
+             <div className="mt-12 flex justify-center gap-12 w-[400px] ml-4">
+                <div className="flex justify-center items-center gap-8 flex-col">
+                    <button onClick={() => handleDontKnowCard(flashcards[currentIndex])}><Image src={Cross} alt="Cross"></Image></button>
+                    <p className="text-[#ff4444]">Still learning</p>
+                </div>
+                <div className="flex justify-center items-center gap-8 flex-col">
+                    <button onClick={() => handleKnowCard(flashcards[currentIndex])}><Image src={Check} alt="Check"></Image></button>
+                    <p className="text-[#14c014]">I know it now</p>
+                </div>
+             </div>
         </div>
     )
 }

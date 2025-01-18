@@ -40,13 +40,9 @@ export default function MatchingGame() {
         if (possibleMatches.length === 0) {
             setFlashcards(updateFlashcards("active"));
             setPossibleMatches([card]);
-            console.log("purple");
         } else {
-            console.log("purple");
             setFlashcards(updateFlashcards("active"));
             if (possibleMatches[0].id === card.id) {
-                console.log("green");
-                console.log("green");
                 setFlashcards(updateFlashcards("right", possibleMatches[0]));
                 setTimeout(() => {
                     const newFlashcards = flashcards.filter((flashcard) => flashcard.id !== card.id); // Makes sure to get both flashcards that were matched
@@ -55,13 +51,7 @@ export default function MatchingGame() {
 
                 setPossibleMatches([]);
             } else {
-                console.log("red");
-                console.log("red");
-
                 setFlashcards(updateFlashcards("wrong", possibleMatches[0]));
-
-                console.log("gray");
-                console.log("gray");
 
                 setTimeout(() => {
                     setFlashcards(updateFlashcards("base", possibleMatches[0]));
