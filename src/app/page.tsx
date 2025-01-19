@@ -49,10 +49,12 @@ export default function Home() {
 
   const getFlashcardDecks = async(email : any) => {
     try {
-      const response = await fetch(`/api/flashcardDecks?email=${email}`);
-      const data = await response.json();
-      console.log(data);
-      return data;
+      const response = await fetch(`/api/getFlashCardDecks?email=${email}`);
+      console.log(response);
+      const json = await response.json();
+      console.log(json.data);
+
+      return json.data;
     } catch (error) {
       return null;
     }
@@ -93,7 +95,7 @@ export default function Home() {
             flashcardDecks?.map((deck, index) => (
               <div className="border-primary_blue border-2 px-4 py-4 flex justify-between items-center w-60 cursor-pointer rounded-md" key={index} onClick={() => handleFlashcardDeckClick(deck.id)}>
                 <p>{deck.name}</p>
-                <p>1</p>
+                <p>Length</p>
               </div>
           ))}
         </div>
