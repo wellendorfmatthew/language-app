@@ -25,7 +25,8 @@ export const GET = async (req: NextRequest) => {
         }
         
         const flashcardDecks = await prisma.flashcardDeck.findMany({
-                where: { userId: userExists.id }
+                where: { userId: userExists.id },
+                include: { flashcards: true },
             })
 
         return NextResponse.json({ data: flashcardDecks });
