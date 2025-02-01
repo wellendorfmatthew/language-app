@@ -61,7 +61,7 @@ export default function Home() {
   }
 
   const handleFlashcardDeckClick = (flashcardDeckID : string) => {
-    console.log(`render page with flashcards from flashcard deck with id of ${flashcardDeckID}`);
+    router.push(`flashcards/${flashcardDeckID}`);
   }
 
   const signout = async() => {
