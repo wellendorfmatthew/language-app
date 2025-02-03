@@ -8,11 +8,54 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import AddFlashCardForm from "./components/addflashcard";
 import { FlashcardDeck } from "@prisma/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import Plus from "../../public/plus-button.png";
 
 export default function Home() {
   const router = useRouter();
   const [signedIn, setSignedIn] = useState(false);
   const [flashcardDecks, setFlashcardDecks] = useState<FlashcardDeck[]>([]);
+  const [newDeckName, setNewDeckName] = useState("");
+
+  const createFlashcardDeck = async(name: string) => {
+    console.log(name);
+    try {
+        const response = await fetch("/api/addFlashCardDeck", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              userID: "d01c6a29-fab1-403e-af5c-2812f3f97fb0", // Later change to actual userID value
+              name: name
+            })
+        });
+
+        if (!response.ok) {
+            const json = await response.json();
+            throw new Error(json.message);
+        }
+
+        const json = await response.json();
+        console.log(json);
+        console.log(json.data);
+
+        setFlashcardDecks([...flashcardDecks, json.data]);
+        setNewDeckName("");
+
+        return json.data;
+    } catch (error: any) {
+        console.log(error);
+    }
+}
 
   useEffect(() => {
     (async () => { 
@@ -91,6 +134,37 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center gap-20">
         <Header />
         <div className="grid grid-cols-4 gap-8">
+        <Dialog>
+                <DialogTrigger asChild>
+                <button className="flex justify-center items-center p-4 rounded-full">
+                    <Image src={Plus} alt="+" />
+                </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle></DialogTitle>
+                        <DialogDescription>
+                            Create a new flashcard
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <label htmlFor="deckname" className="text-right">
+                            Name
+                            </label>
+                            <input
+                            id="deckname"
+                            className="col-span-3"
+                            value={newDeckName}
+                            onChange={(e) => setNewDeckName(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <button onClick={() => createFlashcardDeck(newDeckName)}>Save changes</button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
           {
             flashcardDecks?.map((deck, index) => (
               <div className="border-primary_blue border-2 px-4 py-4 flex justify-between items-center w-60 cursor-pointer rounded-md" key={index} onClick={() => handleFlashcardDeckClick(deck.id)}>

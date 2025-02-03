@@ -9,7 +9,7 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogFooter
-  } from "@/components/ui/dialog"
+  } from "@/components/ui/dialog";
   
 import { Flashcard } from "@prisma/client";
 import Trashcan from "../../../public/trash-can-small.png";
