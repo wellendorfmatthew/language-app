@@ -15,7 +15,7 @@ import Check from "../../../public/langapp-checkbutton.png";
 import Cross from "../../../public/langapp-deletebutton.png";
 import Image from "next/image";
 
-export default function GetFlashCards() {
+export default function LearningGame() {
     const [api, setApi] = useState<CarouselApi>();
     const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
     const [facingFront, setFacingFront] = useState(true);
