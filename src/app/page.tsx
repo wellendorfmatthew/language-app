@@ -20,6 +20,7 @@ import {
 import Plus from "../../public/plus-button.png";
 import Edit from "../../public/edit-button.png";
 import Trash from "../../public/trash-can-small.png";
+import FlashcardIcon from "../../public/blue-card.png";
 
 export default function Home() {
   const router = useRouter();
@@ -200,83 +201,61 @@ export default function Home() {
 
   if (signedIn) {
     return (
-      <div className="flex flex-col items-center justify-center gap-20">
+      <div className="flex flex-col items-center justify-center gap-8">
         <Header />
-        <div className="grid grid-cols-4 gap-8">
-        <Dialog>
-                <DialogTrigger asChild>
-                <button className="flex justify-center items-center p-4 rounded-full">
-                    <Image src={Plus} alt="+" />
-                </button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle></DialogTitle>
-                        <DialogDescription>
-                            Create a new flashcard deck
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <label htmlFor="deckname" className="text-right">
-                            Name
-                            </label>
-                            <input
-                            id="deckname"
-                            className="col-span-3"
-                            value={newDeckName}
-                            onChange={(e) => setNewDeckName(e.target.value)}
-                            />
+        <div className="flex flex-col gap-8 justify-center items-center">
+          <h1 className="font-bold text-3xl">Flashcard Decks</h1>
+            <Dialog>
+                    <DialogTrigger asChild>
+                    <button className="flex justify-center items-center rounded-full hover:brightness-110 transition delay-75">
+                        <Image src={Plus} alt="+" />
+                    </button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle></DialogTitle>
+                            <DialogDescription>
+                                Create a new flashcard deck
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <label htmlFor="deckname" className="text-right">
+                                Name
+                                </label>
+                                <input
+                                id="deckname"
+                                className="col-span-3"
+                                value={newDeckName}
+                                onChange={(e) => setNewDeckName(e.target.value)}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <DialogFooter>
-                        <button onClick={() => createFlashcardDeck(newDeckName)}>Save changes</button>
-                    </DialogFooter>
-                </DialogContent>
+                        <DialogFooter>
+                            <button onClick={() => createFlashcardDeck(newDeckName)}>Save changes</button>
+                        </DialogFooter>
+                    </DialogContent>
             </Dialog>
-          {
-            flashcardDecks?.map((deck, index) => (
-              <div className="border-primary_blue border-2 px-4 py-4 flex justify-between items-center w-60 cursor-pointer rounded-md flex-col gap-8" key={index}>
-                <div className="flex justify-center items-center gap-4">
-                  <Dialog>
-                      <DialogTrigger asChild>
-                      <button className="flex justify-center items-center p-4 rounded-full">
-                          <Image src={Edit} alt="e" />
-                      </button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                              <DialogTitle></DialogTitle>
-                              <DialogDescription>
-                                  Edit the flashcard deck
-                              </DialogDescription>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                              <div className="grid grid-cols-4 items-center gap-4">
-                                  <label htmlFor="deckname" className="text-right">
-                                  Name
-                                  </label>
-                                  <input
-                                  id="deckname"
-                                  className="col-span-3"
-                                  value={deck.name}
-                                  onChange={(e) => setFlashcardDecks((prev) => prev.map((card) => card.id === deck.id ? { ...card, name: e.target.value } : card))}
-                                  />
-                              </div>
-                          </div>
-                          <DialogFooter>
-                              <button onClick={() => editFlashcardDeck(deck.id, deck.name)}>Save changes</button>
-                          </DialogFooter>
-                      </DialogContent>
-                  </Dialog>
-                  <button className="flex justify-center items-center p-4 rounded-full" onClick={() => deleteFlashcardDeck(deck.id)}>
-                    <Image src={Trash} alt="d" />
-                  </button>
-                </div>
-                <p onClick={() => handleFlashcardDeckClick(deck.id)}>{deck.name}</p>
-                <p>Length</p>
-              </div>
-          ))}
+            <div className="grid lg:grid-cols-4 grid-cols-1 gap-12">
+              {
+                flashcardDecks?.map((deck, index) => (
+                  <div 
+                  className="border-primary_blue border-2 py-4 flex justify-start items-center w-60 cursor-pointer rounded-md gap-8 hover:shadow-xl" 
+                  key={index}
+                  onClick={() => handleFlashcardDeckClick(deck.id)} 
+                  >
+                    <Image src={FlashcardIcon} alt="card" />
+                    <div className="flex flex-col gap-4 justify-center items-start">
+                      <p 
+                        className="font-semibold text-base truncate"
+                      >
+                      {deck.name} 
+                      </p>
+                      <p className="font-semibold text-base">{flashcardDecks.length} Terms</p>
+                    </div>
+                  </div>
+              ))}
+            </div>
         </div>
       </div>
     );
