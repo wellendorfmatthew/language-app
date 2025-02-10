@@ -207,9 +207,9 @@ export default function Home() {
           <h1 className="font-bold text-3xl">Flashcard Decks</h1>
             <Dialog>
                     <DialogTrigger asChild>
-                    <button className="flex justify-center items-center rounded-full hover:brightness-110 transition delay-75">
+                      <button className="flex justify-center items-center rounded-full hover:brightness-110 transition delay-75">
                         <Image src={Plus} alt="+" />
-                    </button>
+                      </button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
