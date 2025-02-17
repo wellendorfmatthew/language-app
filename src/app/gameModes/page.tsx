@@ -18,13 +18,13 @@ export default function GameModes() {
             <div className="flex flex-col gap-8 justify-center items-center">
                 <h1 className="font-bold text-3xl">Game Modes</h1>
                 <div className="flex gap-16">
-                    <div className="flex flex-col justify-center items-center gap-4" onClick={() => router.push("/getFlashcards")}>
+                    <div className="flex flex-col justify-center items-center gap-4" onClick={() => router.push("/matching-game")}>
                         <div className="border-primary_blue border-2 rounded-lg flex justify-center items-center cursor-pointer py-8 px-10 hover:shadow-lg">
                             <Image src={MatchingIcon} alt="viewing" />
                         </div>
                         <p className="text-xl font-semibold">Matching</p>
                     </div>
-                    <div className="flex flex-col justify-center items-center gap-4" onClick={() => router.push("/getFlashcards")}>
+                    <div className="flex flex-col justify-center items-center gap-4" onClick={() => router.push("/learning-game")}>
                         <div className="border-primary_blue border-2 rounded-lg flex justify-center items-center cursor-pointer py-8 px-10 hover:shadow-lg">
                             <Image src={LearningIcon} alt="viewing" />
                         </div>
