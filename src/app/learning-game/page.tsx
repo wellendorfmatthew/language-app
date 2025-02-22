@@ -11,16 +11,23 @@ import {
 import { type CarouselApi } from "@/components/ui/carousel";
 import Header from "../components/header";
 import { Flashcard } from "@prisma/client";
-import Check from "../../../public/langapp-checkbutton.png";
-import Cross from "../../../public/langapp-deletebutton.png";
+import Check from "../../../public/check_icon.png";
+import Cross from "../../../public/close_icon.png";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function LearningGame() {
     const [api, setApi] = useState<CarouselApi>();
     const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+    const [unknownCards, setUnknownCards] = useState<Flashcard[]>([]);
+    const [progress, setProgress] = useState(10);
     const [facingFront, setFacingFront] = useState(true);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [id, setID] = useState("");
+    const [id, setID] = useState(0);
+    const [isGameOver, setIsGameOver] = useState(false);
+    const router = useRouter();
 
     const getFlashcards = async() => {
         try {
@@ -40,26 +47,47 @@ export default function LearningGame() {
         }
     }
 
-    const handleKnowCard = (flashcard: Flashcard) => {
-        const newDeck = flashcards.filter((card) => flashcard.id !== card.id);
-        console.log(newDeck);
-        setFlashcards(newDeck);
+    const handleKnowCard = () => {
+        const newId = id + 1;
+        setID(newId);
+        setProgress(progress + 10);
+
+        if (id + 1 === flashcards.length) {
+            setIsGameOver(true);
+        }
     }
 
     const handleDontKnowCard = (flashcard: Flashcard) => {
-        const updatedDeck = flashcards.filter((card) => flashcard.id !== card.id);
-        updatedDeck.push(flashcard);
-        console.log(updatedDeck);
-
-        setFlashcards(updatedDeck);
+        const newId = id + 1;
+        setID(newId);
+        const newUnknownCards = unknownCards;
+        newUnknownCards.push(flashcard);
+        console.log(newUnknownCards);
+        setUnknownCards(newUnknownCards);
+        
+        if (id + 1 === flashcards.length) {
+            setIsGameOver(true);
+        }
     }
 
-    const handleSlideChange = (index: number) => {
-        setCurrentIndex(index);
-        const currentFlashcard = flashcards[index];
-        if (currentFlashcard) {
-            setID(currentFlashcard.id);
+    const shuffleCards = (cards: Flashcard[]): Flashcard[] => {
+        const newArray = [...cards];
+        
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
         }
+        
+        return newArray;
+    }
+
+    const restartGame = () => {
+        setIsGameOver(false);
+        setID(0);
+        setProgress(0);
+        setUnknownCards([]);
+        const newShuffledCards = shuffleCards(flashcards);
+        setFlashcards(newShuffledCards);
     }
 
     useEffect(() => {
@@ -71,54 +99,83 @@ export default function LearningGame() {
             console.log("Can't get cards");
         }
 
-        setFlashcards(flashcardDeck)
+        const shuffledDeck = shuffleCards(flashcardDeck);
+
+        console.log(shuffledDeck);
+        console.log(shuffledDeck[0]);
+        console.log(shuffledDeck[0].question);
+
+        setFlashcards(shuffledDeck)
     })()
     }, []);
 
-    useEffect(() => {
-        if (!api) {
-            return;
-        }
-
-        api.on("select", () => {
-            const index = api.selectedScrollSnap();
-            handleSlideChange(index);
-        })
-    }, [api]);
-
-    return (
-        <div className="flex flex-col items-center justify-center w-full">
-            <Header />
-            <Carousel className="max-w-4xl justify-center items-center mt-20" setApi={setApi}>
-                <CarouselContent>
-                    {flashcards.map((flashcard) => (
-                        <CarouselItem key={flashcard.id}>
-                            <div className="flip-card cursor-pointer ml-[256px]" onClick={() => setFacingFront(!facingFront)}>
-                                <div className={`flip-card-inner ${!facingFront ? "flipped" : ""}`}>
-                                    <div className="flip-card-front bg-primary_blue rounded-xl">
-                                        <p>{flashcard.question}</p>
+    if (isGameOver) {
+        return (
+            <div className="flex flex-col items-center justify-center w-full">
+                <Header />
+                <div className="mt-12 flex flex-col justify-center items-center gap-8">
+                    <h1 className="font-bold text-3xl">Cards to Study</h1>
+                    <div className="grid grid-cols-3 gap-8">
+                        {
+                            unknownCards.map((card, index) => (
+                                <div className="flex flex-col gap-4 items-center justify-center border-2 rounded-lg border-black w-80 h-52" key={index}>
+                                    <div className="flex flex-col gap-2 items-center justify-center">
+                                        <p className="font-bold">Question</p>
+                                        <p>{card.question}</p>
                                     </div>
-                                    <div className="flip-card-back bg-primary_blue rounded-xl">
-                                        <p>{flashcard.answer}</p>
+                                    <div className="flex flex-col gap-2 items-center justify-center">
+                                        <p className="font-bold">Answer</p>
+                                        <p>{card.answer}</p>
                                     </div>
                                 </div>
+                            ))
+                        }      
+                    </div>
+                    <div className="flex items-center justify-center gap-4">
+                        <button 
+                            className="border-black rounded-lg flex items-center justify-center text-base font-bol border-2 p-2 w-32 h-12" 
+                            onClick={() => restartGame()}
+                        >
+                        Play Again
+                        </button>
+                        <button 
+                            className="border-black rounded-lg flex items-center justify-center text-base font-bol border-2 p-2 w-32 h-12" 
+                            onClick={() => router.push("/")}
+                        >
+                        Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    } else {
+        return (
+            <div className="flex flex-col items-center justify-center w-full">
+                <Header />
+                 <div className="mt-12 flex flex-col justify-center items-center gap-8">
+                    <h1 className="font-bold text-3xl">Learning Game</h1>
+                    <Progress value={progress} className="h-8 w-80" />
+                    {flashcards.length > 0 ? (
+                        <div className="flip-card cursor-pointer" onClick={() => setFacingFront(!facingFront)}>
+                            <div className={`flip-card-inner ${!facingFront ? "flipped" : ""}`}>
+                                <div className="flip-card-front border-2 rounded-lg border-black">
+                                    <p className="font-bold">{flashcards[id].question}</p>
+                                </div>
+                                <div className="flip-card-back border-2 rounded-lg border-black">
+                                    <p className="font-bold">{flashcards[id].answer}</p>
+                                </div>
                             </div>
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-            </Carousel>
-             <div className="mt-12 flex justify-center gap-12 w-[400px] ml-4">
-                <div className="flex justify-center items-center gap-8 flex-col">
-                    <button onClick={() => handleDontKnowCard(flashcards[currentIndex])}><Image src={Cross} alt="Cross"></Image></button>
-                    <p className="text-[#ff4444]">Still learning</p>
-                </div>
-                <div className="flex justify-center items-center gap-8 flex-col">
-                    <button onClick={() => handleKnowCard(flashcards[currentIndex])}><Image src={Check} alt="Check"></Image></button>
-                    <p className="text-[#14c014]">I know it now</p>
-                </div>
-             </div>
-        </div>
-    )
+                        </div>
+                    ) : (
+                        <Skeleton className="w-80 h-52 rounded-lg" />
+                    )}
+                    <div className="flex items-center justify-center gap-4">
+                        <button className="bg-primary_red rounded-3xl text-white py-3 px-3 w-24 flex items-center justify-center" ><Image src={Cross} alt="X" className="w-[32px] h-[32px]" onClick={() => handleDontKnowCard(flashcards[id])} /></button>
+                        <p className="text-xl font-bold w-[51px] text-center">{id + 1}/{flashcards.length}</p>
+                        <button className="bg-primary_green rounded-3xl text-white py-3 px-3 w-24 flex items-center justify-center" ><Image src={Check} alt="Check" className="w-[32px] h-[32px]" onClick={() => handleKnowCard()} /></button>
+                    </div>
+                 </div>
+            </div>
+        )
+    }
 }
