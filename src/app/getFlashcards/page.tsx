@@ -53,7 +53,7 @@ export default function GetFlashCards() {
         <div className="flex flex-col items-center">
             <Header />
             <Carousel>
-                <CarouselContent className="-ml-4">
+                <CarouselContent className="ml-4">
                     {flashcards.map((flashcard, index) => (
                         <CarouselItem className="pl-4" key={index}>
                             <p>Question: {flashcard.question}</p>
