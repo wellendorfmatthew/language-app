@@ -9,6 +9,7 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import Header from "../components/header";
+import { useRouter } from "next/navigation";
 import { Flashcard } from "@prisma/client";
 
 type CardStyle = "base" | "active" | "right" | "wrong";
@@ -23,6 +24,9 @@ type MatchingCard = {
 export default function MatchingGame() {
     const [flashcards, setFlashcards] = useState<MatchingCard[]>([]);
     const [possibleMatches, setPossibleMatches] = useState<MatchingCard[]>([]);
+    const [isGameOver, setIsGameOver] = useState(true);
+    const [time, setTime] = useState("0.0");
+    const router = useRouter();
 
     const handleCardClick = (card: MatchingCard) => {
         const updateFlashcards = (style: CardStyle, firstCard?: MatchingCard) => {
@@ -47,6 +51,7 @@ export default function MatchingGame() {
                 setTimeout(() => {
                     const newFlashcards = flashcards.filter((flashcard) => flashcard.id !== card.id); // Makes sure to get both flashcards that were matched
                     setFlashcards(newFlashcards);
+                    console.log(newFlashcards);
                 }, 300);
 
                 setPossibleMatches([]);
@@ -106,6 +111,28 @@ export default function MatchingGame() {
         }
     }
 
+    const restartGame = async() => {
+        setFlashcards([]);
+        const deck = await getFlashcards();
+        const shuffledDeck = shuffleCards(deck);
+        setFlashcards(shuffledDeck);
+        setIsGameOver(false);
+    }
+
+    const timer = (startTime = Date.now()) => {
+        const elapsedTime = Date.now() - startTime;
+        const elapsedSeconds = elapsedTime / 1000;
+
+        setTime(`${elapsedSeconds.toFixed(1)}`);
+
+        if (isGameOver) {
+            console.log("Timer stopped");
+            return;
+        }
+
+        setTimeout(() => timer(startTime), 100);
+    }
+
     useEffect(() => {
     (async () => { 
         const flashcardDeck = await getFlashcards();
@@ -114,33 +141,89 @@ export default function MatchingGame() {
         console.log(shuffledDeck);
 
         setFlashcards(shuffledDeck);
+        setIsGameOver(false);
     })()
     }, []);
 
-    return (
-        <div className="flex flex-col items-center">
-            <Header />
-            <div className="grid grid-cols-4 gap-4 mt-12">
-                {flashcards.map((flashcard, index) => (
-                    <div 
-                        className={`w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer
-                            ${
-                                flashcard.style === "active"
-                                    ? "bg-primary_purple"
-                                    : flashcard.style === "right"
-                                    ? "bg-primary_green"
-                                    : flashcard.style === "wrong"
-                                    ? "bg-primary_red"
-                                    : "hover:bg-gray-400 duration-300"
-                            }`}
-                        key={index}
-                        onClick={() => handleCardClick(flashcard)}
+    useEffect(() => {
+        if (isGameOver) {
+            console.log("Timer stopped");
+            return;
+        }
+
+        const startTime = Date.now();
+
+        const updateTimer = () => {
+            const elapsedTime = Date.now() - startTime;
+            setTime((elapsedTime / 1000).toFixed(1));
+
+            if (!isGameOver) {
+                timeoutId = setTimeout(updateTimer, 100);
+            }
+        };
+
+        let timeoutId = setTimeout(updateTimer, 100);
+
+        return () => clearTimeout(timeoutId);
+    }, [isGameOver]);
+
+    useEffect(() => {
+        if (flashcards.length === 0) {
+            setIsGameOver(true);
+            console.log("owari da");
+        }
+    }, [flashcards])
+
+    if (isGameOver) {
+        return (
+            <div className="flex flex-col items-center">
+                <Header />
+                <h1 className="font-bold text-3xl mt-12">Your Score</h1>
+                <p className="font-bold text-xl mt-4">{time}</p>
+                <div className="flex items-center justify-center gap-4 mt-8">
+                    <button 
+                         className="border-black rounded-lg flex items-center justify-center text-base font-bol border-2 p-2 w-32 h-12" 
+                        onClick={() => restartGame()}
                     >
-                        {flashcard.field}
-                    </div>
-                    ))
-                }
+                    Play Again
+                    </button>
+                    <button 
+                        className="border-black rounded-lg flex items-center justify-center text-base font-bol border-2 p-2 w-32 h-12" 
+                        onClick={() => router.push("/")}
+                    >
+                    Home
+                    </button>
+                </div>
             </div>
-        </div>
-    )
+        )
+    } else {
+        return (
+            <div className="flex flex-col items-center">
+                <Header />
+                <h1 className="font-bold text-3xl mt-12">Matching Game</h1>
+                <p className="font-bold text-xl mt-4">{time}</p>
+                <div className="grid grid-cols-4 gap-4 mt-12">
+                    {flashcards.map((flashcard, index) => (
+                        <div 
+                            className={`w-60 h-60 rounded-lg border-primary_blue border-4 flex justify-center items-center cursor-pointer
+                                ${
+                                    flashcard.style === "active"
+                                        ? "bg-primary_purple"
+                                        : flashcard.style === "right"
+                                        ? "bg-primary_green"
+                                        : flashcard.style === "wrong"
+                                        ? "bg-primary_red"
+                                        : "hover:bg-gray-400 duration-300"
+                                }`}
+                            key={index}
+                            onClick={() => handleCardClick(flashcard)}
+                        >
+                            {flashcard.field}
+                        </div>
+                        ))
+                    }
+                </div>
+            </div>
+        )
+    }
 }
