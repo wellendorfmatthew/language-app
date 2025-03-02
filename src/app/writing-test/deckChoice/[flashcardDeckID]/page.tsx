@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
-import Header from "../components/header";
+import Header from "@/app/components/header";
 import { Flashcard } from "@prisma/client";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 
 export default function WritingTest() {
@@ -14,10 +15,11 @@ export default function WritingTest() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [id, setID] = useState(0);
     const [answer, setAnswer] = useState("");
+    const params = useParams<{ flashcardDeckID: string }>();
 
     const getFlashcards = async() => {
         try {
-            const response = await fetch(`api/getFlashCards?id=${"765a621a-b0bb-417d-b8fe-03025eef6d5d"}`);
+            const response = await fetch(`/api/getFlashCards?id=${params.flashcardDeckID}`);
     
             if (!response.ok) {
                 const json = await response.json();
