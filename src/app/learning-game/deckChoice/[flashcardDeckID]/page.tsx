@@ -9,13 +9,13 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import { type CarouselApi } from "@/components/ui/carousel";
-import Header from "../components/header";
+import Header from "../../../components/header";
 import { Flashcard } from "@prisma/client";
-import Check from "../../../public/check_icon.png";
-import Cross from "../../../public/close_icon.png";
+import Check from "../../../../../public/check_icon.png";
+import Cross from "../../../../../public/close_icon.png";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 
 export default function LearningGame() {
@@ -28,10 +28,11 @@ export default function LearningGame() {
     const [id, setID] = useState(0);
     const [isGameOver, setIsGameOver] = useState(false);
     const router = useRouter();
+    const params = useParams<{ flashcardDeckID: string }>();
 
     const getFlashcards = async() => {
         try {
-            const response = await fetch(`api/getFlashCards?id=${"765a621a-b0bb-417d-b8fe-03025eef6d5d"}`);
+            const response = await fetch(`/api/getFlashCards?id=${params.flashcardDeckID}`);
     
             if (!response.ok) {
                 const json = await response.json();

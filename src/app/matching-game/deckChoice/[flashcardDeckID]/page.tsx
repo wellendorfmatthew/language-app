@@ -8,8 +8,8 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel";
-import Header from "../components/header";
-import { useRouter } from "next/navigation";
+import Header from "../../../components/header";
+import { useRouter, useParams } from "next/navigation";
 import { Flashcard } from "@prisma/client";
 
 type CardStyle = "base" | "active" | "right" | "wrong";
@@ -27,6 +27,7 @@ export default function MatchingGame() {
     const [isGameOver, setIsGameOver] = useState(true);
     const [time, setTime] = useState("0.0");
     const router = useRouter();
+    const params = useParams<{ flashcardDeckID: string }>();
 
     const handleCardClick = (card: MatchingCard) => {
         const updateFlashcards = (style: CardStyle, firstCard?: MatchingCard) => {
@@ -95,8 +96,8 @@ export default function MatchingGame() {
 
     const getFlashcards = async() => {
         try {
-            const response = await fetch(`api/getFlashCards?id=${"765a621a-b0bb-417d-b8fe-03025eef6d5d"}`);
-    
+            console.log(params.flashcardDeckID);
+            const response = await fetch(`/api/getFlashCards?id=${params.flashcardDeckID}`);
             if (!response.ok) {
                 const json = await response.json();
                 throw new Error(json.message);
